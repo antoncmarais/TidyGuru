@@ -7,7 +7,8 @@ import { DataTable } from "@/components/DataTable";
 import { DateRangeSelector } from "@/components/DateRangeSelector";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { parseCSV, exportToCSV, SalesData } from "@/utils/csvParser";
+import { parseCSV, SalesData } from "@/utils/csvParser";
+import { exportToPDF } from "@/utils/pdfExporter";
 import {
   DollarSign,
   TrendingDown,
@@ -149,11 +150,10 @@ const Index = () => {
   }, [filteredData]);
 
   const handleExport = () => {
-    const exportData = filteredData.map((row) => row.rawData);
-    exportToCSV(exportData, `filtered-${fileName || "export.csv"}`);
+    exportToPDF(filteredData, metrics, fileName);
     toast({
       title: "Export successful",
-      description: `Exported ${exportData.length} rows`,
+      description: `Exported ${filteredData.length} rows to PDF`,
     });
   };
 
