@@ -186,7 +186,7 @@ const Index = () => {
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
-              Export CSV
+              Export to .pdf
             </Button>
             <Button variant="outline" size="sm" onClick={handleClearData}>
               <X className="h-4 w-4 mr-2" />
