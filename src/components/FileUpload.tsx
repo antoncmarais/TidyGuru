@@ -48,10 +48,13 @@ export const FileUpload = ({ onFileUpload }: FileUploadProps) => {
             <Upload className="w-10 h-10 text-primary" />
           </div>
           <p className="mb-2 text-base font-medium text-foreground">
-            <span className="font-semibold text-primary">Click to upload</span> or drag and drop
+            <span className="font-semibold text-primary">Drop your sales CSV here</span> or click to upload
           </p>
-          <p className="text-sm text-muted-foreground">
-            CSV files from Shopify, Gumroad, Whop, Etsy, and more
+          <p className="text-sm text-muted-foreground mb-2">
+            See insights in seconds
+          </p>
+          <p className="text-xs text-muted-foreground/70">
+            Supports Shopify, Gumroad, Whop, Etsy, and more
           </p>
         </div>
         <input

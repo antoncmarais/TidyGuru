@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import logoIcon from "@/assets/logo-icon.png";
 import { FileUpload } from "@/components/FileUpload";
 import { LandingPreview } from "@/components/LandingPreview";
 import { KPICard } from "@/components/KPICard";
@@ -18,6 +19,7 @@ import {
   Receipt,
   Download,
   X,
+  Upload,
 } from "lucide-react";
 import {
   startOfWeek,
@@ -161,23 +163,41 @@ const Index = () => {
   if (salesData.length === 0) {
     return (
       <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="gradient-hero border-b border-border/50">
-          <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-            <div className="text-center animate-fade-in">
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-3 tracking-tight">
-                Mini Sales Tracker
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Upload your sales CSV and see instant insights
-              </p>
+        {/* Sticky Header */}
+        <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img src={logoIcon} alt="MSD Logo" className="h-8 w-8" />
+              <span className="text-lg font-semibold text-foreground">Mini Sales Dashboard</span>
             </div>
+            <Button 
+              size="sm" 
+              className="shadow-sm"
+              onClick={() => document.getElementById('file-upload')?.click()}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Upload CSV
+            </Button>
           </div>
         </header>
 
+        {/* Hero Section */}
+        <section className="gradient-hero border-b border-border/50">
+          <div className="max-w-6xl mx-auto px-4 py-16 md:py-20">
+            <div className="text-center animate-fade-in max-w-3xl mx-auto">
+              <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4 tracking-tight">
+                Mini Sales Dashboard
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground">
+                Upload your sales CSV and get instant analytics across platforms
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Main Content */}
-        <main className="max-w-4xl mx-auto px-4 py-12 md:py-16">
-          <div className="space-y-12">
+        <main className="max-w-5xl mx-auto px-4 py-12 md:py-16">
+          <div className="space-y-16">
             {/* Upload Section */}
             <div className="animate-slide-up">
               <FileUpload onFileUpload={handleFileUpload} />
@@ -189,9 +209,9 @@ const Index = () => {
         </main>
 
         {/* Footer */}
-        <footer className="py-8 text-center animate-fade-in" style={{ animationDelay: "0.5s" }}>
+        <footer className="py-10 text-center animate-fade-in border-t border-border/50 mt-16" style={{ animationDelay: "0.5s" }}>
           <p className="text-sm text-muted-foreground">
-            Built with ❤️ using AI
+            Built with ❤️ using Bolt AI · Works with Shopify, Gumroad, Whop, and more
           </p>
         </footer>
       </div>
