@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { FileUpload } from "@/components/FileUpload";
+import { LandingPreview } from "@/components/LandingPreview";
 import { KPICard } from "@/components/KPICard";
 import { RevenueChart } from "@/components/RevenueChart";
 import { TopProductsChart } from "@/components/TopProductsChart";
@@ -159,18 +160,40 @@ const Index = () => {
 
   if (salesData.length === 0) {
     return (
-      <div className="min-h-screen bg-background p-4 md:p-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-2">
-              Mini Sales Tracker
-            </h1>
-            <p className="text-muted-foreground">
-              Upload your CSV and see instant analytics
-            </p>
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="gradient-hero border-b border-border/50">
+          <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
+            <div className="text-center animate-fade-in">
+              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-3 tracking-tight">
+                Mini Sales Tracker
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Upload your sales CSV and see instant insights
+              </p>
+            </div>
           </div>
-          <FileUpload onFileUpload={handleFileUpload} />
-        </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="max-w-4xl mx-auto px-4 py-12 md:py-16">
+          <div className="space-y-12">
+            {/* Upload Section */}
+            <div className="animate-slide-up">
+              <FileUpload onFileUpload={handleFileUpload} />
+            </div>
+
+            {/* Preview Section */}
+            <LandingPreview />
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="py-8 text-center animate-fade-in" style={{ animationDelay: "0.5s" }}>
+          <p className="text-sm text-muted-foreground">
+            Built with ❤️ using AI
+          </p>
+        </footer>
       </div>
     );
   }
