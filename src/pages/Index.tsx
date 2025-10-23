@@ -175,7 +175,7 @@ const Index = () => {
             </div>
             <Button 
               size="sm" 
-              className="shadow-sm"
+              className="shadow-sm bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Sign Up Free
             </Button>
@@ -200,7 +200,7 @@ const Index = () => {
         {/* Footer */}
         <footer className="py-10 text-center border-t border-border/50">
           <p className="text-sm text-muted-foreground">
-            Built with ❤️ using Bolt AI · Works with Shopify, Gumroad, Whop, and more
+            Works with Shopify, Gumroad, Whop, Etsy, and more
           </p>
         </footer>
       </div>
