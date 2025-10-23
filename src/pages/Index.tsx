@@ -23,7 +23,6 @@ import {
   Receipt,
   Download,
   X,
-  Upload,
 } from "lucide-react";
 import {
   startOfWeek,
@@ -177,13 +176,8 @@ const Index = () => {
             <Button 
               size="sm" 
               className="shadow-sm"
-              onClick={() => {
-                const uploadSection = document.getElementById('upload-section');
-                uploadSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
             >
-              <Upload className="h-4 w-4 mr-2" />
-              Upload CSV
+              Sign Up Free
             </Button>
           </div>
         </header>
@@ -202,23 +196,6 @@ const Index = () => {
 
         {/* CTA Section */}
         <CTASection />
-
-        {/* Upload Section */}
-        <section id="upload-section" className="py-20 md:py-28 bg-background border-t border-border/50">
-          <div className="max-w-3xl mx-auto px-4">
-            <div className="text-center mb-12 animate-fade-in">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Ready to get started?
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Upload your sales CSV and see instant insights
-              </p>
-            </div>
-            <div className="animate-slide-up">
-              <FileUpload onFileUpload={handleFileUpload} />
-            </div>
-          </div>
-        </section>
 
         {/* Footer */}
         <footer className="py-10 text-center border-t border-border/50">
