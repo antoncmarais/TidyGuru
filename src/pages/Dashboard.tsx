@@ -443,14 +443,19 @@ const Dashboard = () => {
                   <div className="h-px bg-border flex-1 max-w-[100px]" />
                 </div>
                 
-                <Button
-                  variant="outline"
-                  onClick={downloadSampleCSV}
-                  className="mx-auto"
-                >
-                  <FileDown className="mr-2 h-4 w-4" />
-                  Download Sample CSV
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    onClick={downloadSampleCSV}
+                    className="mx-auto"
+                  >
+                    <FileDown className="mr-2 h-4 w-4" />
+                    Download Sample CSV
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Don't have a CSV file? Download our sample to test all features
+                  </p>
+                </div>
                 
                 <div className="pt-4 space-y-2">
                   <p className="text-xs text-muted-foreground">
