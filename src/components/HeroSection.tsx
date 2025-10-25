@@ -20,7 +20,7 @@ export const HeroSection = () => {
             into clean insights
           </h1>
           <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8 leading-relaxed">
-            Upload your sales CSV and watch it turn into instant analytics — no setup, no spreadsheets.
+            Upload your sales CSV and watch it turn into instant analytics — no setup, no fuss.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button 
