@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import heroMain from "@/assets/u2945372488_sleek_3D_hero_visual_showing_transformation_from__f69b79c1-2301-4189-ac40-32eabb918506_3.png";
+import heroMain from "@/assets/hero-dashboard.svg";
 
 export const HeroSection = () => {
   return (
@@ -40,9 +40,9 @@ export const HeroSection = () => {
         {/* Hero Image */}
         <div className="animate-scale-in" style={{ animationDelay: "0.2s" }}>
           <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-            <img 
-              src={heroMain} 
-              alt="Data transformation visualization" 
+            <img
+              src={heroMain}
+              alt="High-fidelity analytics dashboard visualization"
               className="w-full h-auto"
             />
             {/* Overlay gradient for depth */}
