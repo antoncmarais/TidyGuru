@@ -31,7 +31,7 @@ export const ImpactSection = () => {
             Simple tools make the biggest impact
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Mini Sales Dashboard was built for creators, indie founders, and small teams who want clarity without complexity.
+            TidyGuru was built for creators, indie founders, and small teams who want clarity without complexity.
           </p>
         </div>
 
