@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const CTASection = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-20 md:py-28 gradient-hero relative overflow-hidden">
       {/* Ambient glow effects */}
@@ -20,6 +23,7 @@ export const CTASection = () => {
             <Button 
               size="lg"
               className="bg-white text-primary hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300 text-lg px-8 py-6"
+              onClick={() => navigate("/signup")}
             >
               Sign Up to Continue
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -28,6 +32,7 @@ export const CTASection = () => {
               size="lg"
               variant="ghost"
               className="text-white hover:bg-white/10 text-lg px-8 py-6"
+              onClick={() => navigate("/login")}
             >
               Already have an account? Log In
             </Button>
