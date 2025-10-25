@@ -31,7 +31,7 @@ export const CTASection = () => {
             <Button 
               size="lg"
               variant="ghost"
-              className="text-white hover:bg-white/10 text-lg px-8 py-6"
+              className="text-white hover:bg-white hover:text-primary text-lg px-8 py-6 bg-transparent"
               onClick={() => navigate("/login")}
             >
               Already have an account? Log In
