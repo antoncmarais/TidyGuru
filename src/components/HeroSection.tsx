@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import heroMain from "@/assets/hero-main.png";
+import heroMain from "@/assets/u2945372488_sleek_3D_hero_visual_showing_transformation_from__f69b79c1-2301-4189-ac40-32eabb918506_3.png";
 
 export const HeroSection = () => {
   return (
