@@ -6,15 +6,19 @@ interface KPICardProps {
   value: string;
   icon: LucideIcon;
   trend?: string;
+  subtitle?: string;
 }
 
-export const KPICard = ({ title, value, icon: Icon, trend }: KPICardProps) => {
+export const KPICard = ({ title, value, icon: Icon, trend, subtitle }: KPICardProps) => {
   return (
     <Card className="p-6 transition-shadow hover:shadow-md">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <p className="text-2xl font-bold text-foreground">{value}</p>
+          {subtitle && (
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
+          )}
           {trend && (
             <p className="text-xs text-muted-foreground">{trend}</p>
           )}

@@ -21,7 +21,10 @@ import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useAuth } from "@/contexts/AuthContext";
 import { parseCSV, SalesData, exportToCSV } from "@/utils/csvParser";
 import { exportToPDF } from "@/utils/pdfExporter";
+import { downloadSampleCSV } from "@/utils/sampleData";
 import { FileUpload } from "@/components/FileUpload";
+import { DashboardSkeleton } from "@/components/DashboardSkeleton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DollarSign,
   TrendingDown,
@@ -34,6 +37,9 @@ import {
   LogOut,
   User,
   Upload,
+  Repeat,
+  Award,
+  FileDown,
 } from "lucide-react";
 import {
   startOfWeek,
@@ -176,6 +182,20 @@ const Dashboard = () => {
     const netRevenue = grossSales - totalRefunds - totalFees;
     const ordersCount = filteredData.filter((row) => row.amount > 0).length;
     const avgOrderValue = ordersCount > 0 ? grossSales / ordersCount : 0;
+    
+    // Calculate best selling product
+    const productRevenue = filteredData.reduce((acc, row) => {
+      const revenue = row.amount - row.refund - row.fees;
+      acc[row.product] = (acc[row.product] || 0) + revenue;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const bestProduct = Object.entries(productRevenue).sort((a, b) => b[1] - a[1])[0];
+    const bestProductName = bestProduct ? bestProduct[0] : "N/A";
+    const bestProductRevenue = bestProduct ? bestProduct[1] : 0;
+    
+    // Calculate conversion rate (orders with sales / total rows)
+    const conversionRate = filteredData.length > 0 ? (ordersCount / filteredData.length) * 100 : 0;
 
     return {
       grossSales: `$${grossSales.toFixed(2)}`,
@@ -183,6 +203,9 @@ const Dashboard = () => {
       netRevenue: `$${netRevenue.toFixed(2)}`,
       ordersCount: ordersCount.toString(),
       avgOrderValue: `$${avgOrderValue.toFixed(2)}`,
+      bestProduct: bestProductName.length > 20 ? bestProductName.slice(0, 20) + "..." : bestProductName,
+      bestProductRevenue: `$${bestProductRevenue.toFixed(2)}`,
+      conversionRate: `${conversionRate.toFixed(1)}%`,
     };
   }, [filteredData]);
 
@@ -324,7 +347,7 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen bg-background">
         {/* Header */}
-        <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-border/50">
+        <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-950/80 border-b border-border/50">
           <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img src={logoIcon} alt="TidyGuru Logo" className="h-8 w-8" />
@@ -332,7 +355,9 @@ const Dashboard = () => {
                 TidyGuru
               </span>
             </div>
-            <DropdownMenu>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                   <Avatar className="h-9 w-9">
@@ -363,22 +388,57 @@ const Dashboard = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </div>
           </div>
         </header>
 
         {/* Empty State */}
         <div className="flex items-center justify-center min-h-[calc(100vh-80px)] px-4">
-          <div className="text-center max-w-md space-y-6">
-            <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <Upload className="h-8 w-8 text-primary" />
+          <div className="text-center max-w-lg space-y-6">
+            <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+              <Upload className="h-10 w-10 text-primary" />
             </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold">Welcome to TidyGuru!</h2>
-              <p className="text-muted-foreground">
-                Upload your first CSV file to start analyzing your sales data
+            <div className="space-y-3">
+              <h2 className="text-3xl font-bold">Welcome to TidyGuru!</h2>
+              <p className="text-muted-foreground text-lg">
+                Transform your messy sales data into clean, actionable insights
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Upload your CSV file from Shopify, Gumroad, Whop, Etsy, or any platform
               </p>
             </div>
-            <FileUpload onFileUpload={handleFileUpload} isLoading={isLoading} />
+            
+            {isLoading ? (
+              <DashboardSkeleton />
+            ) : (
+              <>
+                <FileUpload onFileUpload={handleFileUpload} isLoading={isLoading} />
+                
+                <div className="flex items-center gap-4 justify-center">
+                  <div className="h-px bg-border flex-1 max-w-[100px]" />
+                  <span className="text-xs text-muted-foreground">OR</span>
+                  <div className="h-px bg-border flex-1 max-w-[100px]" />
+                </div>
+                
+                <Button
+                  variant="outline"
+                  onClick={downloadSampleCSV}
+                  className="mx-auto"
+                >
+                  <FileDown className="mr-2 h-4 w-4" />
+                  Download Sample CSV
+                </Button>
+                
+                <div className="pt-4 space-y-2">
+                  <p className="text-xs text-muted-foreground">
+                    ✨ Get instant insights: Revenue trends, top products, refund analysis
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    🔒 100% private - all processing happens in your browser
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -388,13 +448,15 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-border/50">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-950/80 border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={logoIcon} alt="TidyGuru Logo" className="h-8 w-8" />
             <span className="text-lg font-semibold text-foreground">TidyGuru</span>
           </div>
-          <DropdownMenu>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9">
@@ -425,6 +487,7 @@ const Dashboard = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </header>
 
@@ -457,15 +520,29 @@ const Dashboard = () => {
           onPresetSelect={handlePresetSelect}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard title="Gross Sales" value={metrics.grossSales} icon={DollarSign} />
-          <KPICard title="Refunds" value={metrics.totalRefunds} icon={TrendingDown} />
           <KPICard title="Net Revenue" value={metrics.netRevenue} icon={TrendingUp} />
           <KPICard title="Orders" value={metrics.ordersCount} icon={ShoppingCart} />
           <KPICard
             title="Avg Order Value"
             value={metrics.avgOrderValue}
             icon={Receipt}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <KPICard title="Refunds" value={metrics.totalRefunds} icon={TrendingDown} />
+          <KPICard 
+            title="Best Product" 
+            value={metrics.bestProduct}
+            subtitle={metrics.bestProductRevenue}
+            icon={Award} 
+          />
+          <KPICard 
+            title="Conversion Rate" 
+            value={metrics.conversionRate}
+            icon={Repeat}
           />
         </div>
 
