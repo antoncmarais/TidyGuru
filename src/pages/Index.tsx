@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import logoIcon from "@/assets/logo-icon.png";
 import { FileUpload } from "@/components/FileUpload";
 import { HeroSection } from "@/components/HeroSection";
@@ -13,7 +13,9 @@ import { DataTable } from "@/components/DataTable";
 import { DateRangeSelector } from "@/components/DateRangeSelector";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { parseCSV, SalesData } from "@/utils/csvParser";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { parseCSV, SalesData, exportToCSV } from "@/utils/csvParser";
 import { exportToPDF } from "@/utils/pdfExporter";
 import {
   DollarSign,
@@ -34,19 +36,54 @@ import {
 } from "date-fns";
 import { DateRange } from "react-day-picker";
 
+interface SerializedSalesData {
+  date: string;
+  product: string;
+  amount: number;
+  refund: number;
+  fees: number;
+  rawData: Record<string, string | number>;
+}
+
 const Index = () => {
+  // Use localStorage for persistent data
+  const [storedData, setStoredData] = useLocalStorage<SerializedSalesData[]>("tidyguru-sales-data", []);
+  const [columns, setColumns] = useLocalStorage<string[]>("tidyguru-columns", []);
+  const [fileName, setFileName] = useLocalStorage<string>("tidyguru-filename", "");
+
   const [salesData, setSalesData] = useState<SalesData[]>([]);
-  const [columns, setColumns] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [fileName, setFileName] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
+  // Restore dates from localStorage on mount
+  useEffect(() => {
+    if (storedData.length > 0) {
+      const restoredData = storedData.map((item) => ({
+        ...item,
+        date: new Date(item.date),
+      }));
+      setSalesData(restoredData);
+    }
+  }, []);
+
   const handleFileUpload = async (file: File) => {
+    setIsLoading(true);
     try {
       const { data, columns } = await parseCSV(file);
+
+      // Store data in state
       setSalesData(data);
       setColumns(columns);
       setFileName(file.name);
+
+      // Serialize dates for localStorage
+      const serializedData = data.map((item) => ({
+        ...item,
+        date: item.date.toISOString(),
+      }));
+      setStoredData(serializedData);
+
       toast({
         title: "Upload successful",
         description: `Parsed ${data.length} rows from ${file.name}`,
@@ -54,9 +91,11 @@ const Index = () => {
     } catch (error) {
       toast({
         title: "Parse error",
-        description: "Failed to parse CSV file. Please check the format.",
+        description: error instanceof Error ? error.message : "Failed to parse CSV file. Please check the format.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,6 +104,10 @@ const Index = () => {
     setColumns([]);
     setFileName("");
     setDateRange(undefined);
+
+    // Clear localStorage
+    setStoredData([]);
+
     toast({
       title: "Data cleared",
       description: "All data has been removed",
@@ -124,17 +167,20 @@ const Index = () => {
 
   const revenueChartData = useMemo(() => {
     const grouped = filteredData.reduce((acc, row) => {
-      const dateKey = format(row.date, "MMM dd");
+      const dateKey = row.date.getTime();
       if (!acc[dateKey]) {
-        acc[dateKey] = 0;
+        acc[dateKey] = { date: row.date, revenue: 0 };
       }
-      acc[dateKey] += row.amount - row.refund - row.fees;
+      acc[dateKey].revenue += row.amount - row.refund - row.fees;
       return acc;
-    }, {} as Record<string, number>);
+    }, {} as Record<number, { date: Date; revenue: number }>);
 
-    return Object.entries(grouped)
-      .map(([date, revenue]) => ({ date, revenue }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return Object.values(grouped)
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
+      .map(({ date, revenue }) => ({
+        date: format(date, "MMM dd"),
+        revenue,
+      }));
   }, [filteredData]);
 
   const topProductsData = useMemo(() => {
@@ -148,20 +194,77 @@ const Index = () => {
 
     return Object.entries(grouped)
       .map(([product, revenue]) => ({
-        product: product.length > 20 ? product.slice(0, 20) + "..." : product,
+        product,
+        fullProduct: product, // Keep full name for tooltip
+        displayProduct: product.length > 20 ? product.slice(0, 20) + "..." : product,
         revenue,
       }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
   }, [filteredData]);
 
-  const handleExport = () => {
-    exportToPDF(filteredData, metrics, fileName);
-    toast({
-      title: "Export successful",
-      description: `Exported ${filteredData.length} rows to PDF`,
-    });
+  const handleExportPDF = () => {
+    try {
+      exportToPDF(filteredData, metrics, fileName);
+      toast({
+        title: "Export successful",
+        description: `Exported ${filteredData.length} rows to PDF`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: error instanceof Error ? error.message : "Failed to export data to PDF",
+        variant: "destructive",
+      });
+    }
   };
+
+  const handleExportCSV = () => {
+    try {
+      const csvFileName = `sales-data-${format(new Date(), "yyyy-MM-dd")}.csv`;
+      exportToCSV(filteredData, csvFileName);
+      toast({
+        title: "Export successful",
+        description: `Exported ${filteredData.length} rows to CSV`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: error instanceof Error ? error.message : "Failed to export data to CSV",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Keyboard shortcuts (only active when data is loaded)
+  useKeyboardShortcuts(
+    salesData.length > 0
+      ? [
+          {
+            key: "e",
+            ctrl: true,
+            action: handleExportPDF,
+            description: "Export to PDF",
+          },
+          {
+            key: "e",
+            ctrl: true,
+            shift: true,
+            action: handleExportCSV,
+            description: "Export to CSV",
+          },
+          {
+            key: "k",
+            ctrl: true,
+            action: () => {
+              const searchInput = document.querySelector('input[placeholder="Search..."]') as HTMLInputElement;
+              searchInput?.focus();
+            },
+            description: "Focus search",
+          },
+        ]
+      : []
+  );
 
   if (salesData.length === 0) {
     return (
@@ -173,8 +276,8 @@ const Index = () => {
               <img src={logoIcon} alt="TidyGuru Logo" className="h-8 w-8" />
               <span className="text-lg font-semibold text-foreground">TidyGuru</span>
             </div>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               className="shadow-sm bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Sign Up Free
@@ -182,27 +285,38 @@ const Index = () => {
           </div>
         </header>
 
-        {/* Hero Section */}
-        <HeroSection />
+        {isLoading ? (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="text-sm text-muted-foreground">Parsing your CSV file...</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Hero Section */}
+            <HeroSection />
 
-        {/* Impact Section */}
-        <ImpactSection />
+            {/* Impact Section */}
+            <ImpactSection />
 
-        {/* How It Works Section */}
-        <HowItWorksSection />
+            {/* How It Works Section */}
+            <HowItWorksSection />
 
-        {/* Testimonials Section */}
-        <TestimonialsSection />
+            {/* Testimonials Section */}
+            <TestimonialsSection />
 
-        {/* CTA Section */}
-        <CTASection />
+            {/* CTA Section */}
+            <CTASection />
 
-        {/* Footer */}
-        <footer className="py-10 text-center border-t border-border/50">
-          <p className="text-sm text-muted-foreground">
-            Works with Shopify, Gumroad, Whop, Etsy, and more
-          </p>
-        </footer>
+            {/* Footer */}
+            <footer className="py-10 text-center border-t border-border/50">
+              <p className="text-sm text-muted-foreground">
+                Works with Shopify, Gumroad, Whop, Etsy, and more
+              </p>
+            </footer>
+          </>
+        )}
       </div>
     );
   }
@@ -216,9 +330,19 @@ const Index = () => {
             <p className="text-sm text-muted-foreground">{fileName}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={handleExport}>
+            <Button variant="outline" size="sm" onClick={handleExportPDF} title="Ctrl+E">
               <Download className="h-4 w-4 mr-2" />
-              Export to .pdf
+              Export PDF
+              <kbd className="ml-2 hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                <span className="text-xs">⌘</span>E
+              </kbd>
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportCSV} title="Ctrl+Shift+E">
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+              <kbd className="ml-2 hidden lg:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                <span className="text-xs">⌘⇧</span>E
+              </kbd>
             </Button>
             <Button variant="outline" size="sm" onClick={handleClearData}>
               <X className="h-4 w-4 mr-2" />

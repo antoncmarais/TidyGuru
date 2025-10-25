@@ -1,5 +1,5 @@
 import Papa from "papaparse";
-import { parse, isValid } from "date-fns";
+import { parse, isValid, format } from "date-fns";
 
 export interface SalesData {
   date: Date;
@@ -87,6 +87,10 @@ const detectColumns = (headers: string[]) => {
   };
 };
 
+interface CSVRow {
+  [key: string]: string | number;
+}
+
 export const parseCSV = (file: File): Promise<{
   data: SalesData[];
   columns: string[];
@@ -99,24 +103,29 @@ export const parseCSV = (file: File): Promise<{
         try {
           const headers = results.meta.fields || [];
           const detected = detectColumns(headers);
-          
-          const salesData: SalesData[] = results.data.map((row: any) => {
-            const dateStr = detected.dateCol ? row[detected.dateCol] : "";
+
+          if (!results.data || results.data.length === 0) {
+            reject(new Error("CSV file is empty or invalid"));
+            return;
+          }
+
+          const salesData: SalesData[] = (results.data as CSVRow[]).map((row) => {
+            const dateStr = detected.dateCol ? String(row[detected.dateCol] || "") : "";
             const date = parseDate(dateStr) || new Date();
-            
+
             const product = detected.productCol
               ? String(row[detected.productCol] || "Unknown")
               : "Unknown";
-            
+
             const amount = detected.amountCol
               ? parseCurrency(row[detected.amountCol])
               : 0;
-            
+
             // Check if this row is a refund
             const isRefundRow = Object.values(row).some((val) =>
               String(val).toLowerCase().includes("refund")
             );
-            
+
             const refund = detected.refundCol
               ? Math.abs(parseCurrency(row[detected.refundCol]))
               : isRefundRow
@@ -124,11 +133,11 @@ export const parseCSV = (file: File): Promise<{
               : amount < 0
               ? Math.abs(amount)
               : 0;
-            
+
             const fees = detected.feesCol
               ? Math.abs(parseCurrency(row[detected.feesCol]))
               : 0;
-            
+
             return {
               date,
               product,
@@ -138,29 +147,50 @@ export const parseCSV = (file: File): Promise<{
               rawData: row,
             };
           });
-          
+
           resolve({ data: salesData, columns: headers });
         } catch (error) {
-          reject(error);
+          reject(error instanceof Error ? error : new Error("Failed to parse CSV"));
         }
       },
       error: (error) => {
-        reject(error);
+        reject(new Error(`CSV parsing error: ${error.message}`));
       },
     });
   });
 };
 
-export const exportToCSV = (data: any[], filename: string) => {
-  const csv = Papa.unparse(data);
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute("href", url);
-  link.setAttribute("download", filename);
-  link.style.visibility = "hidden";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+export const exportToCSV = (data: SalesData[], filename: string): void => {
+  try {
+    if (!data || data.length === 0) {
+      throw new Error("No data to export");
+    }
+
+    const csvData = data.map((row) => ({
+      Date: format(row.date, "yyyy-MM-dd"),
+      Product: row.product,
+      Amount: row.amount.toFixed(2),
+      Refund: row.refund.toFixed(2),
+      Fees: row.fees.toFixed(2),
+      Net: (row.amount - row.refund - row.fees).toFixed(2),
+    }));
+
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("CSV export failed:", error);
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to export CSV"
+    );
+  }
 };
