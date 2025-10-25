@@ -22,6 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { parseCSV, SalesData, exportToCSV } from "@/utils/csvParser";
 import { exportToPDF } from "@/utils/pdfExporter";
 import { downloadSampleCSV } from "@/utils/sampleData";
+import { uploadService } from "@/services/uploadService";
 import { FileUpload } from "@/components/FileUpload";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -40,6 +41,7 @@ import {
   Repeat,
   Award,
   FileDown,
+  FolderOpen,
 } from "lucide-react";
 import {
   startOfWeek,
@@ -78,6 +80,10 @@ const Dashboard = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [currentUploadId, setCurrentUploadId] = useLocalStorage<string | null>(
+    "tidyguru-current-upload-id",
+    null
+  );
 
   // Restore dates from localStorage on mount
   useEffect(() => {
@@ -95,7 +101,7 @@ const Dashboard = () => {
     try {
       const { data, columns } = await parseCSV(file);
 
-      // Store data in state
+      // Store data in state and localStorage (for immediate access)
       setSalesData(data);
       setColumns(columns);
       setFileName(file.name);
@@ -107,10 +113,23 @@ const Dashboard = () => {
       }));
       setStoredData(serializedData);
 
-      toast({
-        title: "Upload successful",
-        description: `Parsed ${data.length} rows from ${file.name}`,
-      });
+      // Save to Supabase in background
+      const upload = await uploadService.createUpload(file.name, data);
+      
+      if (upload) {
+        setCurrentUploadId(upload.id);
+        toast({
+          title: "Upload successful",
+          description: `Saved ${data.length} rows to cloud`,
+        });
+      } else {
+        // Still show success even if cloud save fails (localStorage backup)
+        toast({
+          title: "Upload successful",
+          description: `Parsed ${data.length} rows from ${file.name}`,
+        });
+      }
+
       setShowUploadDialog(false);
     } catch (error) {
       toast({
@@ -377,6 +396,10 @@ const Dashboard = () => {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/uploads")}>
+                  <FolderOpen className="mr-2 h-4 w-4" />
+                  My Uploads
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/settings")}>
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
@@ -476,6 +499,10 @@ const Dashboard = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/uploads")}>
+                <FolderOpen className="mr-2 h-4 w-4" />
+                My Uploads
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate("/settings")}>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
