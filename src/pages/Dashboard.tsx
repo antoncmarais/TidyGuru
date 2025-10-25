@@ -92,6 +92,7 @@ const Dashboard = () => {
       const restoredData = storedData.map((item) => ({
         ...item,
         date: new Date(item.date),
+        quantity: item.quantity || 1, // Default to 1 for old data without quantity
       }));
       setSalesData(restoredData);
     }
@@ -111,6 +112,7 @@ const Dashboard = () => {
       const serializedData = data.map((item) => ({
         ...item,
         date: item.date.toISOString(),
+        quantity: item.quantity || 1, // Ensure quantity is always saved
       }));
       setStoredData(serializedData);
 
