@@ -23,8 +23,8 @@ export const config = {
     url: import.meta.env.VITE_API_URL || null,
   },
   supabase: {
-    url: import.meta.env.VITE_SUPABASE_URL || "https://bqjohfxzzfhrmqhgalcd.supabase.co",
-    anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxam9oZnh6emZocm1xaGdhbGNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5ODQ0ODIsImV4cCI6MjA2NTU2MDQ4Mn0.cSGDmic5q7O7yONrsreRdfB_oRHKRHVj5WtDJej5O3E",
+    url: import.meta.env.VITE_SUPABASE_URL || "https://scgfirihidgzhbybzzim.supabase.co",
+    anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjZ2ZpcmloaWRnemhieWJ6emltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODcyMTEsImV4cCI6MjA3Njk2MzIxMX0.oe-K0VdpLHi1UWCxypCrIfS8CA_tSN3swU4zl-QU0H8",
   },
 } as const;
 
