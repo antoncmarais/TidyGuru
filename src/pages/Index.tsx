@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import logoIcon from "@/assets/logo-icon.png";
 import { FileUpload } from "@/components/FileUpload";
 import { HeroSection } from "@/components/HeroSection";
@@ -13,6 +13,8 @@ import { DataTable } from "@/components/DataTable";
 import { DateRangeSelector } from "@/components/DateRangeSelector";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { parseCSV, SalesData, exportToCSV } from "@/utils/csvParser";
 import { exportToPDF } from "@/utils/pdfExporter";
 import {
@@ -34,21 +36,54 @@ import {
 } from "date-fns";
 import { DateRange } from "react-day-picker";
 
+interface SerializedSalesData {
+  date: string;
+  product: string;
+  amount: number;
+  refund: number;
+  fees: number;
+  rawData: Record<string, string | number>;
+}
+
 const Index = () => {
+  // Use localStorage for persistent data
+  const [storedData, setStoredData] = useLocalStorage<SerializedSalesData[]>("tidyguru-sales-data", []);
+  const [columns, setColumns] = useLocalStorage<string[]>("tidyguru-columns", []);
+  const [fileName, setFileName] = useLocalStorage<string>("tidyguru-filename", "");
+
   const [salesData, setSalesData] = useState<SalesData[]>([]);
-  const [columns, setColumns] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [fileName, setFileName] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
+
+  // Restore dates from localStorage on mount
+  useEffect(() => {
+    if (storedData.length > 0) {
+      const restoredData = storedData.map((item) => ({
+        ...item,
+        date: new Date(item.date),
+      }));
+      setSalesData(restoredData);
+    }
+  }, []);
 
   const handleFileUpload = async (file: File) => {
     setIsLoading(true);
     try {
       const { data, columns } = await parseCSV(file);
+
+      // Store data in state
       setSalesData(data);
       setColumns(columns);
       setFileName(file.name);
+
+      // Serialize dates for localStorage
+      const serializedData = data.map((item) => ({
+        ...item,
+        date: item.date.toISOString(),
+      }));
+      setStoredData(serializedData);
+
       toast({
         title: "Upload successful",
         description: `Parsed ${data.length} rows from ${file.name}`,
@@ -69,6 +104,10 @@ const Index = () => {
     setColumns([]);
     setFileName("");
     setDateRange(undefined);
+
+    // Clear localStorage
+    setStoredData([]);
+
     toast({
       title: "Data cleared",
       description: "All data has been removed",
@@ -155,7 +194,9 @@ const Index = () => {
 
     return Object.entries(grouped)
       .map(([product, revenue]) => ({
-        product: product.length > 20 ? product.slice(0, 20) + "..." : product,
+        product,
+        fullProduct: product, // Keep full name for tooltip
+        displayProduct: product.length > 20 ? product.slice(0, 20) + "..." : product,
         revenue,
       }))
       .sort((a, b) => b.revenue - a.revenue)
@@ -194,6 +235,36 @@ const Index = () => {
       });
     }
   };
+
+  // Keyboard shortcuts (only active when data is loaded)
+  useKeyboardShortcuts(
+    salesData.length > 0
+      ? [
+          {
+            key: "e",
+            ctrl: true,
+            action: handleExportPDF,
+            description: "Export to PDF",
+          },
+          {
+            key: "e",
+            ctrl: true,
+            shift: true,
+            action: handleExportCSV,
+            description: "Export to CSV",
+          },
+          {
+            key: "k",
+            ctrl: true,
+            action: () => {
+              const searchInput = document.querySelector('input[placeholder="Search..."]') as HTMLInputElement;
+              searchInput?.focus();
+            },
+            description: "Focus search",
+          },
+        ]
+      : []
+  );
 
   if (salesData.length === 0) {
     return (
@@ -259,13 +330,19 @@ const Index = () => {
             <p className="text-sm text-muted-foreground">{fileName}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={handleExportPDF}>
+            <Button variant="outline" size="sm" onClick={handleExportPDF} title="Ctrl+E">
               <Download className="h-4 w-4 mr-2" />
               Export PDF
+              <kbd className="ml-2 hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                <span className="text-xs">⌘</span>E
+              </kbd>
             </Button>
-            <Button variant="outline" size="sm" onClick={handleExportCSV}>
+            <Button variant="outline" size="sm" onClick={handleExportCSV} title="Ctrl+Shift+E">
               <Download className="h-4 w-4 mr-2" />
               Export CSV
+              <kbd className="ml-2 hidden lg:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                <span className="text-xs">⌘⇧</span>E
+              </kbd>
             </Button>
             <Button variant="outline" size="sm" onClick={handleClearData}>
               <X className="h-4 w-4 mr-2" />
