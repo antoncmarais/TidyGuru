@@ -13,7 +13,7 @@ export const useTheme = () => {
       return "dark";
     }
     
-    return "light";
+    return "dark"; // Default to dark mode
   });
 
   useEffect(() => {
