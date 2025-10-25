@@ -118,10 +118,8 @@ export const subscriptionService = {
 
   // Get Whop checkout URL
   getCheckoutUrl(userEmail?: string): string {
-    const baseUrl = `https://whop.com/${config.whop.companyId.replace('biz_', '')}`;
-    
-    // Try to get product from URL or fallback to direct product page
-    const productUrl = `${baseUrl}/tidyguru-pro`;
+    // Use the actual product URL (company slug is arden-cc77, not the biz ID)
+    const productUrl = 'https://whop.com/arden-cc77/tidyguru-pro';
     
     if (userEmail) {
       const params = new URLSearchParams({ email: userEmail });
