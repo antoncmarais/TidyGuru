@@ -2,9 +2,9 @@ import howItWorks from "@/assets/how-it-works.png";
 
 export const HowItWorksSection = () => {
   const steps = [
-    { number: "01", title: "Upload your CSV", description: "Drag and drop your sales file—takes 5 seconds" },
-    { number: "02", title: "We do the heavy lifting", description: "Instant parsing, cleaning, and validation" },
-    { number: "03", title: "Get actionable insights", description: "Revenue trends, top products, refunds—all crystal clear" },
+    { number: "01", title: "Upload your CSV", description: "Drag and drop or click to upload" },
+    { number: "02", title: "Watch it process", description: "Instant parsing and validation" },
+    { number: "03", title: "Get your dashboard", description: "Beautiful insights in seconds" },
   ];
 
   return (
@@ -12,10 +12,10 @@ export const HowItWorksSection = () => {
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            From chaos to clarity in 60 seconds
+            How it works
           </h2>
           <p className="text-lg text-muted-foreground">
-            Three simple steps. Zero complexity. Total clarity.
+            Three simple steps to transform your data
           </p>
         </div>
 

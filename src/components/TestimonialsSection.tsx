@@ -4,19 +4,19 @@ import { Quote } from "lucide-react";
 export const TestimonialsSection = () => {
   const testimonials = [
     {
-      quote: "I uploaded my Etsy sales CSV and instantly knew which products to restock. Took literally 10 seconds.",
+      quote: "Took 10 seconds to see my real sales trends.",
       author: "Sarah M.",
       role: "Etsy Shop Owner",
       initial: "S",
     },
     {
-      quote: "Finally, a tool that doesn't make me feel like I need a data science degree. Just works.",
+      quote: "Finally, a tool that doesn't make me feel like I need a data team.",
       author: "James K.",
       role: "Indie SaaS Founder",
       initial: "J",
     },
     {
-      quote: "I've spent hours fighting with Excel. This gave me clarity in under a minute. Game changer.",
+      quote: "Instant clarity — no setup, no learning curve.",
       author: "Alex R.",
       role: "Digital Creator",
       initial: "A",
@@ -28,10 +28,10 @@ export const TestimonialsSection = () => {
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Loved by creators who hate complexity
+            Trusted by creators who value clarity over complexity
           </h2>
           <p className="text-lg text-muted-foreground">
-            Real people. Real results. Zero learning curve.
+            Sometimes the simplest tools make the smartest impact
           </p>
         </div>
 

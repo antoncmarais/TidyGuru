@@ -5,20 +5,20 @@ export const ImpactSection = () => {
   const features = [
     {
       icon: Upload,
-      title: "Upload from anywhere",
-      description: "Shopify, Gumroad, Whop, Etsy—if it exports CSV, we handle it. Drag, drop, done.",
+      title: "Upload any CSV",
+      description: "Works with Shopify, Gumroad, Whop, Etsy, and more.",
       gradient: "from-primary/10 to-accent/10",
     },
     {
       icon: Zap,
-      title: "Instant answers to your revenue questions",
-      description: "Which products are winning? Where's your money going? Know in seconds, not hours.",
+      title: "See insights instantly",
+      description: "Totals, refunds, and top products in seconds.",
       gradient: "from-accent/10 to-primary-light/10",
     },
     {
       icon: Sparkles,
-      title: "Zero learning curve",
-      description: "If you can drag and drop a file, you're ready. No tutorials, no training, no complexity.",
+      title: "No setup required",
+      description: "Just upload and go.",
       gradient: "from-accent-warm/10 to-primary/10",
     },
   ];
@@ -28,10 +28,10 @@ export const ImpactSection = () => {
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Everything you need. Nothing you don't.
+            Simple tools make the biggest impact
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Built for creators, indie founders, and small teams who want clarity without complexity. Done with overwhelming analytics? So are we.
+            Mini Sales Dashboard was built for creators, indie founders, and small teams who want clarity without complexity.
           </p>
         </div>
 

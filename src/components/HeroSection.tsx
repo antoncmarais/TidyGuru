@@ -15,15 +15,12 @@ export const HeroSection = () => {
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight leading-tight">
-            Stop Wrestling with Spreadsheets.
+            Transform messy data
             <br />
-            Start Growing Your Business.
+            into clean insights
           </h1>
-          <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-4 leading-relaxed">
-            The analytics dashboard built for creators and indie founders who hate complex tools. Upload your CSV, get instant insights—no setup, no learning curve, no headaches.
-          </p>
-          <p className="text-lg text-white/80 max-w-2xl mx-auto mb-8">
-            ✨ Free forever. No credit card required. Analyze 10,000+ transactions in under a minute.
+          <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8 leading-relaxed">
+            Upload your sales CSV and watch it turn into instant analytics — no setup, no spreadsheets.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button 
@@ -31,7 +28,7 @@ export const HeroSection = () => {
               className="bg-white text-primary hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300 text-lg px-8 py-6"
               onClick={() => navigate("/signup")}
             >
-              Get My Free Dashboard
+              Sign Up Free
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
