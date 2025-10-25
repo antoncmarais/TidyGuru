@@ -1,0 +1,131 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="paint0_linear" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.5" stop-color="#1E293B"/>
+      <stop offset="1" stop-color="#312E81"/>
+    </linearGradient>
+    <radialGradient id="paint1_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1050 180) rotate(45) scale(520 360)">
+      <stop stop-color="#38BDF8" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#1D4ED8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="paint2_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(320 640) rotate(45) scale(480 320)">
+      <stop stop-color="#C084FC" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#4C1D95" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-100" y="-100" width="1640" height="1100" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="60" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="cardGradient" x1="0" y1="0" x2="380" y2="260" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E3A8A"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="widgetGradient" x1="0" y1="0" x2="320" y2="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#1E293B" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="160" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#0EA5E9"/>
+    </linearGradient>
+    <linearGradient id="barGradient2" x1="0" y1="0" x2="0" y2="140" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A855F7"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+    <linearGradient id="barGradient3" x1="0" y1="0" x2="0" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F97316"/>
+      <stop offset="1" stop-color="#FB7185"/>
+    </linearGradient>
+    <linearGradient id="sparklineGradient" x1="0" y1="0" x2="360" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#34D399"/>
+      <stop offset="1" stop-color="#22C55E" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="pieGradient" x1="0" y1="0" x2="0" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="pieGradient2" x1="0" y1="0" x2="0" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F43F5E"/>
+      <stop offset="1" stop-color="#FB7185"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="900" rx="60" fill="url(#paint0_linear)"/>
+  <circle cx="1060" cy="160" r="420" fill="url(#paint1_radial)"/>
+  <circle cx="320" cy="620" r="400" fill="url(#paint2_radial)"/>
+  <g filter="url(#glow)">
+    <rect x="220" y="160" width="1000" height="540" rx="36" fill="#0F172A" fill-opacity="0.6" stroke="#38BDF8" stroke-opacity="0.2" stroke-width="1.5"/>
+    <rect x="260" y="200" width="920" height="460" rx="28" fill="#0B1120" fill-opacity="0.9" stroke="#334155" stroke-width="1"/>
+  </g>
+  <rect x="300" y="240" width="360" height="220" rx="24" fill="url(#cardGradient)" opacity="0.95"/>
+  <g opacity="0.9">
+    <text x="330" y="290" fill="white" font-size="24" font-weight="600" font-family="'Inter', 'Segoe UI', sans-serif">Revenue Overview</text>
+    <text x="330" y="330" fill="#E0F2FE" font-size="16" font-family="'Inter', 'Segoe UI', sans-serif">Last 30 Days</text>
+  </g>
+  <g transform="translate(330 350)">
+    <rect x="0" y="0" width="60" height="160" rx="12" fill="url(#barGradient)"/>
+    <rect x="80" y="20" width="60" height="140" rx="12" fill="url(#barGradient2)"/>
+    <rect x="160" y="-20" width="60" height="200" rx="12" fill="url(#barGradient3)"/>
+    <rect x="240" y="40" width="60" height="120" rx="12" fill="url(#barGradient2)" opacity="0.75"/>
+  </g>
+  <g transform="translate(720 260)">
+    <rect width="360" height="200" rx="24" fill="url(#widgetGradient)"/>
+    <text x="28" y="48" fill="#F8FAFC" font-size="22" font-weight="600" font-family="'Inter', 'Segoe UI', sans-serif">Net Revenue</text>
+    <text x="28" y="90" fill="white" font-size="42" font-weight="700" font-family="'Inter', 'Segoe UI', sans-serif">$148,920</text>
+    <rect x="28" y="110" width="96" height="32" rx="16" fill="rgba(34,197,94,0.18)" stroke="#22C55E" stroke-opacity="0.4"/>
+    <text x="48" y="132" fill="#4ADE80" font-size="16" font-weight="600" font-family="'Inter', 'Segoe UI', sans-serif">+18.4%</text>
+    <polyline points="28,168 88,138 148,152 208,124 268,144 328,98" fill="none" stroke="url(#sparklineGradient)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="328" cy="98" r="9" fill="#34D399" stroke="white" stroke-width="3"/>
+  </g>
+  <g transform="translate(720 500)">
+    <rect width="360" height="200" rx="24" fill="url(#widgetGradient)"/>
+    <text x="28" y="52" fill="#F1F5F9" font-size="22" font-weight="600" font-family="'Inter', 'Segoe UI', sans-serif">Channel Performance</text>
+    <g transform="translate(200 36)">
+      <path d="M80 0A80 80 0 1 1 0 74" fill="none" stroke="url(#pieGradient)" stroke-width="32" stroke-linecap="round"/>
+      <path d="M0 74A80 80 0 0 1 40 -68" fill="none" stroke="url(#pieGradient2)" stroke-width="32" stroke-linecap="round"/>
+    </g>
+    <rect x="32" y="96" width="128" height="56" rx="18" fill="rgba(59,130,246,0.16)" stroke="rgba(59,130,246,0.4)"/>
+    <text x="48" y="130" fill="#BFDBFE" font-size="16" font-weight="500" font-family="'Inter', 'Segoe UI', sans-serif">Top Channel</text>
+    <text x="48" y="156" fill="#E2E8F0" font-size="20" font-weight="600" font-family="'Inter', 'Segoe UI', sans-serif">Marketplace</text>
+  </g>
+  <g transform="translate(300 500)">
+    <rect width="360" height="200" rx="24" fill="url(#widgetGradient)"/>
+    <text x="28" y="60" fill="#F8FAFC" font-size="22" font-weight="600" font-family="'Inter', 'Segoe UI', sans-serif">Daily Insights</text>
+    <polyline points="28,130 88,110 148,150 208,102 268,128 328,96" fill="none" stroke="#38BDF8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="208" cy="102" r="7" fill="#38BDF8" stroke="white" stroke-width="3"/>
+    <circle cx="328" cy="96" r="7" fill="#22D3EE" stroke="white" stroke-width="3"/>
+    <rect x="28" y="84" width="72" height="28" rx="14" fill="rgba(14,165,233,0.2)"/>
+    <text x="48" y="103" fill="#BAE6FD" font-size="14" font-weight="600" font-family="'Inter', 'Segoe UI', sans-serif">+12%</text>
+  </g>
+  <g opacity="0.4" stroke="#334155" stroke-dasharray="6 14" stroke-width="1.5">
+    <path d="M300 240H1160"/>
+    <path d="M300 480H1160"/>
+    <path d="M300 700H1160"/>
+  </g>
+  <g opacity="0.35" stroke="#1E293B" stroke-width="1">
+    <path d="M420 200V660"/>
+    <path d="M540 200V660"/>
+    <path d="M660 200V660"/>
+    <path d="M780 200V660"/>
+    <path d="M900 200V660"/>
+    <path d="M1020 200V660"/>
+  </g>
+  <g opacity="0.6">
+    <text x="300" y="220" fill="#64748B" font-size="14" font-family="'Inter', 'Segoe UI', sans-serif">Overview</text>
+    <text x="420" y="220" fill="#64748B" font-size="14" font-family="'Inter', 'Segoe UI', sans-serif">Revenue</text>
+    <text x="540" y="220" fill="#64748B" font-size="14" font-family="'Inter', 'Segoe UI', sans-serif">Orders</text>
+    <text x="660" y="220" fill="#64748B" font-size="14" font-family="'Inter', 'Segoe UI', sans-serif">Profit</text>
+    <text x="780" y="220" fill="#64748B" font-size="14" font-family="'Inter', 'Segoe UI', sans-serif">Channels</text>
+    <text x="900" y="220" fill="#64748B" font-size="14" font-family="'Inter', 'Segoe UI', sans-serif">Retention</text>
+    <text x="1020" y="220" fill="#64748B" font-size="14" font-family="'Inter', 'Segoe UI', sans-serif">Forecast</text>
+  </g>
+  <g opacity="0.8">
+    <rect x="260" y="720" width="200" height="64" rx="20" fill="rgba(15,23,42,0.88)" stroke="rgba(226,232,240,0.08)"/>
+    <text x="292" y="760" fill="#E2E8F0" font-size="18" font-family="'Inter', 'Segoe UI', sans-serif">Automated alerts</text>
+    <circle cx="312" cy="738" r="6" fill="#22C55E"/>
+    <text x="260" y="812" fill="#94A3B8" font-size="14" font-family="'Inter', 'Segoe UI', sans-serif">Focus on action, not spreadsheets.</text>
+  </g>
+</svg>
