@@ -23,9 +23,11 @@ import { parseCSV, SalesData, exportToCSV } from "@/utils/csvParser";
 import { exportToPDF } from "@/utils/pdfExporter";
 import { downloadSampleCSV } from "@/utils/sampleData";
 import { uploadService } from "@/services/uploadService";
+import { subscriptionService } from "@/services/subscriptionService";
 import { FileUpload } from "@/components/FileUpload";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SubscriptionGate } from "@/components/SubscriptionGate";
 import {
   DollarSign,
   TrendingDown,
@@ -85,6 +87,26 @@ const Dashboard = () => {
     "tidyguru-current-upload-id",
     null
   );
+  
+  // Subscription state
+  const [hasSubscription, setHasSubscription] = useState<boolean>(false);
+  const [checkingSubscription, setCheckingSubscription] = useState(true);
+
+  // Check subscription status
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!user) {
+        setCheckingSubscription(false);
+        return;
+      }
+
+      const hasActive = await subscriptionService.hasActiveSubscription();
+      setHasSubscription(hasActive);
+      setCheckingSubscription(false);
+    };
+
+    checkSubscription();
+  }, [user]);
 
   // Restore dates from localStorage on mount
   useEffect(() => {
@@ -370,6 +392,70 @@ const Dashboard = () => {
     }
     return user?.email?.charAt(0).toUpperCase() || "U";
   };
+
+  // Show loading while checking subscription
+  if (checkingSubscription) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <DashboardSkeleton />
+      </div>
+    );
+  }
+
+  // Show subscription gate if no active subscription
+  if (!hasSubscription) {
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-950/80 border-b border-border/50">
+          <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img src={logoIcon} alt="TidyGuru Logo" className="h-8 w-8" />
+              <span className="text-lg font-semibold text-foreground">
+                TidyGuru
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user?.user_metadata?.full_name || "User"}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/settings")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </header>
+
+        <SubscriptionGate />
+      </div>
+    );
+  }
 
   if (salesData.length === 0) {
     return (
