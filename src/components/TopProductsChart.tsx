@@ -15,15 +15,16 @@ interface TopProductsChartProps {
     fullProduct?: string;
     displayProduct?: string;
     revenue: number;
+    quantity?: number;
   }[];
 }
 
 export const TopProductsChart = ({ data }: TopProductsChartProps) => {
   const productList = data
-    .map((item) => `${item.fullProduct || item.product}: $${item.revenue.toFixed(2)}`)
+    .map((item) => `${item.fullProduct || item.product}: $${item.revenue.toFixed(2)} (${item.quantity} sold)`)
     .join(", ");
 
-  // Custom tooltip to show full product name
+  // Custom tooltip to show full product name, revenue, and quantity
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -35,12 +36,17 @@ export const TopProductsChart = ({ data }: TopProductsChartProps) => {
             border: "1px solid hsl(var(--border))",
           }}
         >
-          <p className="text-sm font-medium text-foreground mb-1">
+          <p className="text-sm font-medium text-foreground mb-2">
             {data.fullProduct || data.product}
           </p>
           <p className="text-sm text-primary font-semibold">
             Revenue: ${payload[0].value.toFixed(2)}
           </p>
+          {data.quantity !== undefined && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Quantity Sold: {data.quantity.toLocaleString()}
+            </p>
+          )}
         </div>
       );
     }

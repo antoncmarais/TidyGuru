@@ -260,21 +260,23 @@ const Dashboard = () => {
     const grouped = filteredData.reduce(
       (acc, row) => {
         if (!acc[row.product]) {
-          acc[row.product] = 0;
+          acc[row.product] = { revenue: 0, quantity: 0 };
         }
-        acc[row.product] += row.amount - row.refund - row.fees;
+        acc[row.product].revenue += row.amount - row.refund - row.fees;
+        acc[row.product].quantity += row.quantity || 0;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, { revenue: number; quantity: number }>
     );
 
     return Object.entries(grouped)
-      .map(([product, revenue]) => ({
+      .map(([product, data]) => ({
         product,
         fullProduct: product,
         displayProduct:
           product.length > 20 ? product.slice(0, 20) + "..." : product,
-        revenue,
+        revenue: data.revenue,
+        quantity: data.quantity,
       }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
