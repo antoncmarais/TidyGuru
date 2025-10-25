@@ -17,6 +17,7 @@ export interface SalesDataRow {
   amount: number;
   refund: number;
   fees: number;
+  quantity: number;
   raw_data: Record<string, string | number>;
   created_at: string;
 }

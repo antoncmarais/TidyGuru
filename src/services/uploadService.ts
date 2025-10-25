@@ -36,6 +36,7 @@ export const uploadService = {
         amount: row.amount,
         refund: row.refund,
         fees: row.fees,
+        quantity: row.quantity || 1,
         raw_data: row.rawData,
       }));
 
@@ -120,6 +121,7 @@ export const uploadService = {
         amount: row.amount,
         refund: row.refund,
         fees: row.fees,
+        quantity: row.quantity || 1,
         rawData: row.raw_data as Record<string, string | number>,
       }));
     } catch (error) {

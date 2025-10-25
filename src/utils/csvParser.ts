@@ -7,6 +7,7 @@ export interface SalesData {
   amount: number;
   refund: number;
   fees: number;
+  quantity: number;
   rawData: Record<string, string | number>;
 }
 
@@ -78,12 +79,17 @@ const detectColumns = (headers: string[]) => {
     h.includes("fee") || h.includes("charge") || h.includes("commission")
   );
   
+  const quantityCol = lower.findIndex((h) =>
+    h.includes("quantity") || h.includes("qty") || h.includes("units") || h.includes("count")
+  );
+  
   return {
     dateCol: dateCol >= 0 ? headers[dateCol] : null,
     productCol: productCol >= 0 ? headers[productCol] : null,
     amountCol: amountCol >= 0 ? headers[amountCol] : null,
     refundCol: refundCol >= 0 ? headers[refundCol] : null,
     feesCol: feesCol >= 0 ? headers[feesCol] : null,
+    quantityCol: quantityCol >= 0 ? headers[quantityCol] : null,
   };
 };
 
@@ -137,6 +143,10 @@ export const parseCSV = (file: File): Promise<{
             const fees = detected.feesCol
               ? Math.abs(parseCurrency(row[detected.feesCol]))
               : 0;
+            
+            const quantity = detected.quantityCol
+              ? parseInt(String(row[detected.quantityCol])) || 1
+              : 1; // Default to 1 if no quantity column
 
             return {
               date,
@@ -144,6 +154,7 @@ export const parseCSV = (file: File): Promise<{
               amount: isRefundRow || amount < 0 ? 0 : Math.abs(amount),
               refund,
               fees,
+              quantity: isRefundRow ? 0 : quantity, // Don't count refunded items
               rawData: row,
             };
           });

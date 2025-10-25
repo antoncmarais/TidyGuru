@@ -42,6 +42,7 @@ import {
   Award,
   FileDown,
   FolderOpen,
+  Package,
 } from "lucide-react";
 import {
   startOfWeek,
@@ -215,6 +216,9 @@ const Dashboard = () => {
     
     // Calculate conversion rate (orders with sales / total rows)
     const conversionRate = filteredData.length > 0 ? (ordersCount / filteredData.length) * 100 : 0;
+    
+    // Calculate total quantity sold
+    const totalQuantity = filteredData.reduce((sum, row) => sum + (row.quantity || 0), 0);
 
     return {
       grossSales: `$${grossSales.toFixed(2)}`,
@@ -225,6 +229,7 @@ const Dashboard = () => {
       bestProduct: bestProductName.length > 20 ? bestProductName.slice(0, 20) + "..." : bestProductName,
       bestProductRevenue: `$${bestProductRevenue.toFixed(2)}`,
       conversionRate: `${conversionRate.toFixed(1)}%`,
+      totalQuantity: totalQuantity.toLocaleString(),
     };
   }, [filteredData]);
 
@@ -563,8 +568,13 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard title="Refunds" value={metrics.totalRefunds} icon={TrendingDown} />
+          <KPICard 
+            title="Quantity Sold" 
+            value={metrics.totalQuantity}
+            icon={Package}
+          />
           <KPICard 
             title="Best Product" 
             value={metrics.bestProduct}
