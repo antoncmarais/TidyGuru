@@ -183,28 +183,28 @@ export const exportToPDF = (
         value: metrics.grossSales,
         color: colors.primary,
         bgColor: [238, 242, 255],
-        icon: "💰",
+        icon: "$",
       },
       {
         label: "Net Revenue",
         value: metrics.netRevenue,
         color: colors.success,
         bgColor: [220, 252, 231],
-        icon: "📈",
+        icon: "↑",
       },
       {
         label: "Total Orders",
         value: metrics.ordersCount,
         color: colors.info,
         bgColor: [219, 234, 254],
-        icon: "🛒",
+        icon: "#",
       },
       {
         label: "Avg Order",
         value: metrics.avgOrderValue,
         color: colors.warning,
         bgColor: [254, 243, 199],
-        icon: "💵",
+        icon: "Ø",
       },
     ];
 
@@ -227,7 +227,7 @@ export const exportToPDF = (
       doc.setFillColor(...card.color);
       doc.roundedRect(x, y, 3, cardHeight, 3, 3, "F");
 
-      // Icon/emoji circle background
+      // Icon circle background
       doc.setFillColor(255, 255, 255);
       doc.circle(x + 15, y + 12, 6, "F");
       doc.setDrawColor(...card.color);
@@ -235,8 +235,10 @@ export const exportToPDF = (
       doc.circle(x + 15, y + 12, 6, "S");
 
       // Icon (text based)
-    doc.setFontSize(10);
-      doc.text(card.icon, x + 12, y + 14);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...card.color);
+      doc.text(card.icon, x + 15, y + 14, { align: "center" });
 
       // Label
       doc.setTextColor(...colors.gray);
@@ -265,13 +267,13 @@ export const exportToPDF = (
         label: "Quantity Sold",
         value: metrics.totalQuantity || "N/A",
         color: colors.info,
-        icon: "📦",
+        icon: "Σ",
       },
       {
         label: "Best Product",
         value: metrics.bestProduct || "N/A",
         color: colors.success,
-        icon: "⭐",
+        icon: "★",
         small: true,
       },
     ];
@@ -293,8 +295,10 @@ export const exportToPDF = (
       doc.roundedRect(x, y, smCardWidth, smCardHeight, 2, 2, "S");
 
       // Icon
-      doc.setFontSize(8);
-      doc.text(metric.icon, x + 4, y + 8);
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...metric.color);
+      doc.text(metric.icon, x + 4, y + 9);
 
       // Label
       doc.setTextColor(...colors.gray);
@@ -313,10 +317,14 @@ export const exportToPDF = (
     yPos += smCardHeight + 12;
 
     // ===== REVENUE TREND CHART =====
+    // Section title with icon
+    doc.setFillColor(...colors.primary);
+    doc.circle(22, yPos - 2, 3, "F");
+    
     doc.setTextColor(...colors.dark);
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    doc.text("📊 Revenue Trend", 20, yPos);
+    doc.text("Revenue Trend", 30, yPos);
 
     yPos += 2;
 
@@ -360,10 +368,14 @@ export const exportToPDF = (
     yPos += chartHeight + 12;
 
     // ===== TOP PRODUCTS CHART =====
+    // Section title with icon
+    doc.setFillColor(...colors.success);
+    doc.circle(22, yPos - 2, 3, "F");
+    
     doc.setTextColor(...colors.dark);
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    doc.text("🏆 Top 5 Products", 20, yPos);
+    doc.text("Top 5 Products", 30, yPos);
 
     yPos += 2;
 
@@ -410,10 +422,14 @@ export const exportToPDF = (
     }
 
     // ===== TRANSACTION DETAILS SECTION =====
+    // Section title with icon
+    doc.setFillColor(...colors.info);
+    doc.circle(22, yPos - 2, 3, "F");
+    
     doc.setTextColor(...colors.dark);
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    doc.text("📋 Transaction Details", 20, yPos);
+    doc.text("Transaction Details", 30, yPos);
 
     yPos += 5;
 
