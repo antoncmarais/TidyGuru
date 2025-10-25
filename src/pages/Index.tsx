@@ -65,8 +65,11 @@ const Index = () => {
 
             {/* Footer */}
             <footer className="py-10 text-center border-t border-border/50">
-              <p className="text-sm text-muted-foreground">
-                Works with Shopify, Gumroad, Whop, Etsy, and more
+              <p className="text-sm text-muted-foreground mb-2">
+                Works with Shopify, Gumroad, Whop, Etsy, WooCommerce, and any platform that exports CSV
+              </p>
+              <p className="text-xs text-muted-foreground/70">
+                Free forever • No credit card required • Privacy-first
               </p>
             </footer>
     </div>

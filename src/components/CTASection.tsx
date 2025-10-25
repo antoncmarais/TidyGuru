@@ -14,10 +14,10 @@ export const CTASection = () => {
       <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
         <div className="animate-fade-in">
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Ready to see your data in a whole new way?
+            Your clearest revenue picture is 60 seconds away
           </h2>
           <p className="text-xl text-white/90 mb-10">
-            Create a free account and start exploring your dashboard.
+            Join hundreds of creators who've ditched spreadsheet chaos. Get started free—no credit card, no setup, no stress.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button 
@@ -25,7 +25,7 @@ export const CTASection = () => {
               className="bg-white text-primary hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300 text-lg px-8 py-6"
               onClick={() => navigate("/signup")}
             >
-              Sign Up to Continue
+              Start Your Free Dashboard
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
