@@ -78,7 +78,11 @@ export const TopProductsChart = ({ data }: TopProductsChartProps) => {
               fontSize={12}
               tickFormatter={(value) => `$${value}`}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip 
+              content={<CustomTooltip />}
+              cursor={{ fill: 'transparent' }}
+              wrapperStyle={{ outline: 'none' }}
+            />
             <Bar
               dataKey="revenue"
               fill="hsl(var(--primary))"
