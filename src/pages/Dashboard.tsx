@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import logoIcon from "@/assets/logo-icon.png";
+import logoIcon from "@/assets/logo-icon.svg";
 import { KPICard } from "@/components/KPICard";
 import { RevenueChart } from "@/components/RevenueChart";
 import { TopProductsChart } from "@/components/TopProductsChart";

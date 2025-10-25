@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import logoIcon from "@/assets/logo-icon.png";
+import logoIcon from "@/assets/logo-icon.svg";
 import { HeroSection } from "@/components/HeroSection";
 import { ImpactSection } from "@/components/ImpactSection";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
@@ -26,8 +26,8 @@ const Index = () => {
         <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-border/50">
           <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-              <img src={logoIcon} alt="TidyGuru Logo" className="h-8 w-8" />
-              <span className="text-lg font-semibold text-foreground">TidyGuru</span>
+              <img src={logoIcon} alt="TidyGuru Logo" className="h-10 w-10" />
+              <span className="text-xl font-bold text-foreground">TidyGuru</span>
           </Link>
           <div className="flex items-center gap-2">
             <Button

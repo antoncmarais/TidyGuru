@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, User, Mail, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
-import logoIcon from "@/assets/logo-icon.png";
+import logoIcon from "@/assets/logo-icon.svg";
 
 const profileSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters"),
