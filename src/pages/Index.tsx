@@ -13,7 +13,7 @@ import { DataTable } from "@/components/DataTable";
 import { DateRangeSelector } from "@/components/DateRangeSelector";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { parseCSV, SalesData } from "@/utils/csvParser";
+import { parseCSV, SalesData, exportToCSV } from "@/utils/csvParser";
 import { exportToPDF } from "@/utils/pdfExporter";
 import {
   DollarSign,
@@ -39,9 +39,11 @@ const Index = () => {
   const [columns, setColumns] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [fileName, setFileName] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
   const handleFileUpload = async (file: File) => {
+    setIsLoading(true);
     try {
       const { data, columns } = await parseCSV(file);
       setSalesData(data);
@@ -54,9 +56,11 @@ const Index = () => {
     } catch (error) {
       toast({
         title: "Parse error",
-        description: "Failed to parse CSV file. Please check the format.",
+        description: error instanceof Error ? error.message : "Failed to parse CSV file. Please check the format.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,17 +128,20 @@ const Index = () => {
 
   const revenueChartData = useMemo(() => {
     const grouped = filteredData.reduce((acc, row) => {
-      const dateKey = format(row.date, "MMM dd");
+      const dateKey = row.date.getTime();
       if (!acc[dateKey]) {
-        acc[dateKey] = 0;
+        acc[dateKey] = { date: row.date, revenue: 0 };
       }
-      acc[dateKey] += row.amount - row.refund - row.fees;
+      acc[dateKey].revenue += row.amount - row.refund - row.fees;
       return acc;
-    }, {} as Record<string, number>);
+    }, {} as Record<number, { date: Date; revenue: number }>);
 
-    return Object.entries(grouped)
-      .map(([date, revenue]) => ({ date, revenue }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return Object.values(grouped)
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
+      .map(({ date, revenue }) => ({
+        date: format(date, "MMM dd"),
+        revenue,
+      }));
   }, [filteredData]);
 
   const topProductsData = useMemo(() => {
@@ -155,12 +162,37 @@ const Index = () => {
       .slice(0, 5);
   }, [filteredData]);
 
-  const handleExport = () => {
-    exportToPDF(filteredData, metrics, fileName);
-    toast({
-      title: "Export successful",
-      description: `Exported ${filteredData.length} rows to PDF`,
-    });
+  const handleExportPDF = () => {
+    try {
+      exportToPDF(filteredData, metrics, fileName);
+      toast({
+        title: "Export successful",
+        description: `Exported ${filteredData.length} rows to PDF`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: error instanceof Error ? error.message : "Failed to export data to PDF",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportCSV = () => {
+    try {
+      const csvFileName = `sales-data-${format(new Date(), "yyyy-MM-dd")}.csv`;
+      exportToCSV(filteredData, csvFileName);
+      toast({
+        title: "Export successful",
+        description: `Exported ${filteredData.length} rows to CSV`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: error instanceof Error ? error.message : "Failed to export data to CSV",
+        variant: "destructive",
+      });
+    }
   };
 
   if (salesData.length === 0) {
@@ -173,8 +205,8 @@ const Index = () => {
               <img src={logoIcon} alt="TidyGuru Logo" className="h-8 w-8" />
               <span className="text-lg font-semibold text-foreground">TidyGuru</span>
             </div>
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               className="shadow-sm bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Sign Up Free
@@ -182,27 +214,38 @@ const Index = () => {
           </div>
         </header>
 
-        {/* Hero Section */}
-        <HeroSection />
+        {isLoading ? (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="text-sm text-muted-foreground">Parsing your CSV file...</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Hero Section */}
+            <HeroSection />
 
-        {/* Impact Section */}
-        <ImpactSection />
+            {/* Impact Section */}
+            <ImpactSection />
 
-        {/* How It Works Section */}
-        <HowItWorksSection />
+            {/* How It Works Section */}
+            <HowItWorksSection />
 
-        {/* Testimonials Section */}
-        <TestimonialsSection />
+            {/* Testimonials Section */}
+            <TestimonialsSection />
 
-        {/* CTA Section */}
-        <CTASection />
+            {/* CTA Section */}
+            <CTASection />
 
-        {/* Footer */}
-        <footer className="py-10 text-center border-t border-border/50">
-          <p className="text-sm text-muted-foreground">
-            Works with Shopify, Gumroad, Whop, Etsy, and more
-          </p>
-        </footer>
+            {/* Footer */}
+            <footer className="py-10 text-center border-t border-border/50">
+              <p className="text-sm text-muted-foreground">
+                Works with Shopify, Gumroad, Whop, Etsy, and more
+              </p>
+            </footer>
+          </>
+        )}
       </div>
     );
   }
@@ -216,9 +259,13 @@ const Index = () => {
             <p className="text-sm text-muted-foreground">{fileName}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={handleExport}>
+            <Button variant="outline" size="sm" onClick={handleExportPDF}>
               <Download className="h-4 w-4 mr-2" />
-              Export to .pdf
+              Export PDF
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportCSV}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
             </Button>
             <Button variant="outline" size="sm" onClick={handleClearData}>
               <X className="h-4 w-4 mr-2" />

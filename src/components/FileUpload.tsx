@@ -6,34 +6,55 @@ interface FileUploadProps {
   onFileUpload: (file: File) => void;
 }
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 export const FileUpload = ({ onFileUpload }: FileUploadProps) => {
   const { toast } = useToast();
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      const file = e.dataTransfer.files[0];
-      if (file && file.type === "text/csv") {
-        onFileUpload(file);
-      } else {
+  const validateAndUploadFile = useCallback(
+    (file: File | undefined) => {
+      if (!file) return;
+
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        toast({
+          title: "File too large",
+          description: "Please upload a CSV file smaller than 10MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check file type
+      if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
         toast({
           title: "Invalid file type",
           description: "Please upload a CSV file",
           variant: "destructive",
         });
+        return;
       }
+
+      onFileUpload(file);
     },
     [onFileUpload, toast]
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      validateAndUploadFile(file);
+    },
+    [validateAndUploadFile]
   );
 
   const handleFileInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file) {
-        onFileUpload(file);
-      }
+      validateAndUploadFile(file);
     },
-    [onFileUpload]
+    [validateAndUploadFile]
   );
 
   return (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,10 +19,14 @@ interface DataTableProps {
 export const DataTable = ({ data, columns }: DataTableProps) => {
   const [search, setSearch] = useState("");
 
-  const filteredData = data.filter((row) =>
-    Object.values(row).some((val) =>
-      String(val).toLowerCase().includes(search.toLowerCase())
-    )
+  const filteredData = useMemo(
+    () =>
+      data.filter((row) =>
+        Object.values(row).some((val) =>
+          String(val).toLowerCase().includes(search.toLowerCase())
+        )
+      ),
+    [data, search]
   );
 
   return (
