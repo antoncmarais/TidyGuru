@@ -59,8 +59,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Get raw body
     const rawBody = await getRawBody(req);
     
+    // Build full URL (Vercel only provides the path in req.url)
+    const host = req.headers.host || 'tidy-guru.vercel.app';
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const fullUrl = `${protocol}://${host}${req.url || '/api/whop-webhook'}`;
+    
     // Convert VercelRequest to Web API Request format that Whop SDK expects
-    const webRequest = new Request(req.url || 'https://tidy-guru.vercel.app/api/whop-webhook', {
+    const webRequest = new Request(fullUrl, {
       method: 'POST',
       headers: req.headers as any,
       body: rawBody,
