@@ -23,6 +23,27 @@ interface WhopWebhookEvent {
   };
 }
 
+// Disable body parsing to get raw body
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+// Helper to get raw body from Vercel request
+async function getRawBody(req: VercelRequest): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', (chunk) => {
+      data += chunk;
+    });
+    req.on('end', () => {
+      resolve(data);
+    });
+    req.on('error', reject);
+  });
+}
+
 // Create webhook validator using Whop's official SDK
 const validateWebhook = makeWebhookValidator({
   webhookSecret: WHOP_WEBHOOK_SECRET,
@@ -35,9 +56,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Get raw body
+    const rawBody = await getRawBody(req);
+    
+    // Convert VercelRequest to Web API Request format that Whop SDK expects
+    const webRequest = new Request(req.url || 'https://tidy-guru.vercel.app/api/whop-webhook', {
+      method: 'POST',
+      headers: req.headers as any,
+      body: rawBody,
+    });
+    
     // Validate webhook signature using Whop's SDK
-    // This automatically verifies the x-whop-signature header
-    const webhook = await validateWebhook(req as any);
+    const webhook = await validateWebhook(webRequest);
     
     const event: WhopWebhookEvent = webhook as any;
     console.log('Received Whop event:', event.action, event.data?.id);
