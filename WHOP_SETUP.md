@@ -283,3 +283,5 @@ Need help? Check:
 
 **🎉 You're all set! Users can now subscribe to TidyGuru Pro for $5/month!**
 
+
+

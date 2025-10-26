@@ -153,6 +153,41 @@ export const subscriptionService = {
     }
   },
 
+  // Link Whop membership to current user (after purchase)
+  async linkMembership(membershipId: string): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      // Verify the membership exists and is valid
+      const { valid, data } = await this.verifyWhopMembership(membershipId);
+      if (!valid || !data) {
+        return false;
+      }
+
+      // Create or update subscription
+      const { error } = await supabase
+        .from('user_subscriptions')
+        .upsert({
+          user_id: user.id,
+          whop_user_id: data.user,
+          whop_membership_id: membershipId,
+          product_id: config.whop.productId,
+          status: data.status === 'trialing' ? 'trialing' : 'active',
+          current_period_end: data.expires_at || data.renewal_period_end,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error linking membership:', error);
+      return false;
+    }
+  },
+
   // Cancel subscription (mark as cancelled, actual cancellation happens on Whop)
   async cancelSubscription(): Promise<boolean> {
     try {

@@ -295,7 +295,7 @@ export const exportToPDF = (
       doc.roundedRect(x, y, smCardWidth, smCardHeight, 2, 2, "S");
 
       // Icon
-      doc.setFontSize(10);
+    doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(...metric.color);
       doc.text(metric.icon, x + 4, y + 9);
