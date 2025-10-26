@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import crypto from 'crypto';
+import { makeWebhookValidator } from '@whop/api';
 
 const WHOP_WEBHOOK_SECRET = process.env.WHOP_WEBHOOK_SECRET || '';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
@@ -23,36 +23,10 @@ interface WhopWebhookEvent {
   };
 }
 
-// Disable automatic body parsing so we can verify signature
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-async function getRawBody(req: VercelRequest): Promise<string> {
-  return new Promise((resolve, reject) => {
-    let data = '';
-    req.on('data', (chunk) => {
-      data += chunk;
-    });
-    req.on('end', () => {
-      resolve(data);
-    });
-    req.on('error', reject);
-  });
-}
-
-function verifyWhopSignature(payload: string, signature: string, secret: string): boolean {
-  try {
-    const hmac = crypto.createHmac('sha256', secret);
-    const digest = hmac.update(payload).digest('hex');
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
-  } catch (error) {
-    console.error('Signature verification error:', error);
-    return false;
-  }
-}
+// Create webhook validator using Whop's official SDK
+const validateWebhook = makeWebhookValidator({
+  webhookSecret: WHOP_WEBHOOK_SECRET,
+});
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only allow POST requests
@@ -61,37 +35,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Get signature from headers
-    const signature = req.headers['x-whop-signature'] as string;
-    if (!signature) {
-      console.error('No signature provided');
-      return res.status(401).json({ error: 'No signature' });
-    }
-
-    // Get raw body for signature verification
-    const rawBody = await getRawBody(req);
-
-    // Verify signature - TEMPORARILY DISABLED FOR TESTING
-    // TODO: Fix signature verification algorithm
-    console.log('Webhook received - signature verification temporarily disabled');
-    console.log('Signature from Whop:', signature);
-    console.log('Raw body preview:', rawBody.substring(0, 100));
+    // Validate webhook signature using Whop's SDK
+    // This automatically verifies the x-whop-signature header
+    const webhook = await validateWebhook(req as any);
     
-    // if (WHOP_WEBHOOK_SECRET) {
-    //   const isValid = verifyWhopSignature(rawBody, signature, WHOP_WEBHOOK_SECRET);
-    //   if (!isValid) {
-    //     console.error('Invalid signature');
-    //     console.error('Raw body length:', rawBody.length);
-    //     console.error('Signature:', signature);
-    //     return res.status(401).json({ error: 'Invalid signature' });
-    //   }
-    // } else {
-    //   console.warn('WHOP_WEBHOOK_SECRET not set - skipping signature verification');
-    // }
-
-    // Parse event
-    const event: WhopWebhookEvent = JSON.parse(rawBody);
-    console.log('Received Whop event:', event.action, event.data.id);
+    const event: WhopWebhookEvent = webhook as any;
+    console.log('Received Whop event:', event.action, event.data?.id);
 
     // Initialize Supabase client with service role
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -241,4 +190,3 @@ async function handleMembershipDeactivated(supabase: any, data: any) {
     throw error;
   }
 }
-
