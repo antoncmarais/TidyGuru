@@ -23,6 +23,26 @@ interface WhopWebhookEvent {
   };
 }
 
+// Disable automatic body parsing so we can verify signature
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+async function getRawBody(req: VercelRequest): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', (chunk) => {
+      data += chunk;
+    });
+    req.on('end', () => {
+      resolve(data);
+    });
+    req.on('error', reject);
+  });
+}
+
 function verifyWhopSignature(payload: string, signature: string, secret: string): boolean {
   try {
     const hmac = crypto.createHmac('sha256', secret);
@@ -48,14 +68,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(401).json({ error: 'No signature' });
     }
 
-    // Get raw body
-    const rawBody = JSON.stringify(req.body);
+    // Get raw body for signature verification
+    const rawBody = await getRawBody(req);
 
     // Verify signature
     if (WHOP_WEBHOOK_SECRET) {
       const isValid = verifyWhopSignature(rawBody, signature, WHOP_WEBHOOK_SECRET);
       if (!isValid) {
         console.error('Invalid signature');
+        console.error('Raw body length:', rawBody.length);
+        console.error('Signature:', signature);
         return res.status(401).json({ error: 'Invalid signature' });
       }
     } else {
@@ -63,7 +85,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Parse event
-    const event: WhopWebhookEvent = req.body;
+    const event: WhopWebhookEvent = JSON.parse(rawBody);
     console.log('Received Whop event:', event.action, event.data.id);
 
     // Initialize Supabase client with service role
